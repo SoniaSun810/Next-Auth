@@ -20,7 +20,6 @@ import { FormError } from "@/components/form-error";
 import { FormSucess } from "../form-success";
 import { login } from "@/actions/login";
 import { useTransition, useState} from "react";
-import { start } from "repl";
 
 const LoginForm = () => {
   const [error, setError] = useState<string | undefined>("");
@@ -39,8 +38,8 @@ const LoginForm = () => {
     startTransition(() => {
       login(values)
       .then((data) => {
-        setError(data.error);
-        setSuccess(data.success);
+        setError(data?.error);
+        setSuccess(data?.success);
       })
     });
   };
