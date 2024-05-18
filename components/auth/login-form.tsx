@@ -19,12 +19,18 @@ import { Button } from "@/components/ui/button";
 import { FormError } from "@/components/form-error";
 import { FormSucess } from "../form-success";
 import { login } from "@/actions/login";
-import { useTransition, useState} from "react";
+import { useTransition, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 const LoginForm = () => {
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
+  const searchParams = useSearchParams();
+  const urlError =
+    searchParams.get("error") === "OAuthAccountNotLinked"
+      ? "Email is already registered with a different provider"
+      : "";
 
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
@@ -36,11 +42,11 @@ const LoginForm = () => {
 
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
     startTransition(() => {
-      login(values)
-      .then((data) => {
+      login(values).then((data) => {
         setError(data?.error);
-        setSuccess(data?.success);
-      })
+        // TODO: add when we add 2FA
+        // setSuccess(data?.success);
+      });
     });
   };
 
@@ -91,7 +97,7 @@ const LoginForm = () => {
               )}
             />
           </div>
-          <FormError message={error} />
+          <FormError message={error || urlError} />
           <FormSucess message={success} />
           <Button type="submit" className="w-full" disabled={isPending}>
             Login
