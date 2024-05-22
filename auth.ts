@@ -11,7 +11,7 @@ export const {
   signIn,
   signOut,
 } = NextAuth({
-  pages : {
+  pages: {
     signIn: "/auth/login",
     error: "/auth/error",
   },
@@ -24,15 +24,20 @@ export const {
     },
   },
   callbacks: {
-    // async signIn({ user }) {
-    //   if (!user.id) return false;
+    async signIn({ user, account }) {
+      // Allow OAuth without email verification
+      if (account?.provider !== "credentials") return true;
 
-    //   const existingUser = await getUserById(user.id);
-    //   if (!existingUser || !existingUser.emailVerified) {
-    //     return false;
-    //   }
-    //   return true;
-    // },
+      // Prevent sign in without email verification
+      if (!user.id) return false;
+      const existingUser = await getUserById(user.id);
+      if (!existingUser?.emailVerified) {
+        return false;
+      }
+      // Add 2FA check
+
+      return true;
+    },
 
     async session({ token, session }) {
       if (token.sub && session.user) {
