@@ -4,6 +4,9 @@ import { LoginSchema } from "@/schemas";
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
+import { getUserByEmail } from "@/data/user";
+import { generateVerificationToken } from "@/lib/tokens";
+import { sendVerificationEmail } from "@/lib/mail";
 
 export const login = async (values: z.infer<typeof LoginSchema>) => {
   const validatedFields = LoginSchema.safeParse(values);
@@ -13,6 +16,20 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
   }
 
   const { email, password } = validatedFields.data;
+
+  const exisitngUser = await getUserByEmail(email);
+
+  if (!exisitngUser || !exisitngUser.email || !exisitngUser.password) {
+    return { error: "Invalid credentials" };
+  }
+
+  if (!exisitngUser.emailVerified) {
+    const verificationToken = await generateVerificationToken(
+      exisitngUser.email
+    );
+    await sendVerificationEmail(exisitngUser.email, verificationToken.token);
+    return { success: "Verification email sent" };
+  }
 
   try {
     await signIn("credentials", {
@@ -24,7 +41,7 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
     if (error instanceof AuthError) {
       switch (error.type) {
         case "CredentialsSignin":
-          return { error: "Invalid credentials"};
+          return { error: "Invalid credentials" };
         default:
           return { error: "Something went wrong" };
       }
