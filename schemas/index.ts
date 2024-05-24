@@ -18,3 +18,13 @@ export const RegisterSchema = z.object({
     message: "Name is required",
   }),
 });
+
+export const ResetLinkSchema = z.object({
+  email: z.string().email({
+    message: "Invalid email address",
+  }),
+});
+
+export const ResetPasswordSchema = z.object({
+  password: z.string().min(6),
+});

@@ -27,7 +27,8 @@ export const newVerification = async (token: string) => {
     where: { id: exisitngUser.id },
     data: { emailVerified: new Date(), email: exisitngUser.email },
   });
-
+ 
+  // TODO - delete the token when the user login in
   await db.verificationToken.delete({
     where: { id: existingToken.id },
   });

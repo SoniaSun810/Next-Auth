@@ -12,18 +12,18 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { LoginSchema } from "@/schemas";
+import { ResetLinkSchema } from "@/schemas";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FormError } from "@/components/form-error";
 import { FormSucess } from "../form-success";
-import { login } from "@/actions/login";
+import { resetPasswordLink } from "@/actions/reset-password-link";
 import { useTransition, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-const LoginForm = () => {
+const ResetForm = () => {
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
@@ -33,17 +33,16 @@ const LoginForm = () => {
       ? "Email is already registered with a different provider"
       : "";
 
-  const form = useForm<z.infer<typeof LoginSchema>>({
-    resolver: zodResolver(LoginSchema),
+  const form = useForm<z.infer<typeof ResetLinkSchema>>({
+    resolver: zodResolver(ResetLinkSchema),
     defaultValues: {
       email: "",
-      password: "",
     },
   });
 
-  const onSubmit = (values: z.infer<typeof LoginSchema>) => {
+  const onSubmit = (email: z.infer<typeof ResetLinkSchema>) => {
     startTransition(() => {
-      login(values).then((data) => {
+      resetPasswordLink(email).then((data) => {
         setError(data?.error);
         setSuccess(data?.success);
       });
@@ -65,7 +64,7 @@ const LoginForm = () => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Your Register Email</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
@@ -78,38 +77,16 @@ const LoginForm = () => {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="********"
-                      type="password"
-                      disabled={isPending}
-                    />
-                  </FormControl>
-
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
           <Button type="submit" className="w-full" disabled={isPending}>
-            <Link href="/auth/reset">Forgot password?</Link>
+            Send Verification Link
           </Button>
           <FormError message={error || urlError} />
           <FormSucess message={success} />
-          <Button type="submit" className="w-full" disabled={isPending}>
-            Login
-          </Button>
         </form>
       </Form>
     </CardWrapper>
   );
 };
 
-export default LoginForm;
+export default ResetForm;
