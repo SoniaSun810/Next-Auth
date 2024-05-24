@@ -47,7 +47,7 @@ const NewVerificationForm = () => {
         {!error && !success && <MoonLoader />}
         <div className="mt-10">
           <FormSucess message={success} />
-          {!success && <FormError message={error} />}
+          {!success && <FormError message={error} />} 
         </div>
       </div>
     </CardWrapper>
