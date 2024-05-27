@@ -36,21 +36,22 @@ export const {
         return false;
       }
       // Add 2FA check
-      if(existingUser?.isTwoFactorEnabled){
-        const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(existingUser.id);
-        console.log({twoFactorConfirmation});
-        
+      if (existingUser?.isTwoFactorEnabled) {
+        const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(
+          existingUser.id
+        );
+        console.log({ twoFactorConfirmation });
+
         if (!twoFactorConfirmation) {
           return false;
         }
-        
+
         // Delete the 2FA confirmation after successful login
         await db.twoFactorConfirmation.delete({
           where: {
             id: twoFactorConfirmation.id,
           },
         });
-        
       }
 
       return true;
@@ -64,7 +65,10 @@ export const {
       if (token.role && session.user) {
         session.user.role = token.role as UserRole;
       }
-      console.log({ sessionToken: token, session });
+      if (session.user) {
+        session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean;
+      }
+      console.log("auth", { sessionToken: token, session });
       return session;
     },
 
@@ -75,6 +79,7 @@ export const {
 
       if (!existingUser) return token;
       token.role = existingUser.role;
+      token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
       return token;
     },
   },
