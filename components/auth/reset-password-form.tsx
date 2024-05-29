@@ -29,10 +29,7 @@ const ResetPasswordForm = () => {
   const [success, setSuccess] = useState<string | undefined>();
 
   const onSubmit = (values: z.infer<typeof ResetPasswordSchema>) => {
-    const validatedFields = ResetPasswordSchema.safeParse(values);
-    const { password } = validatedFields?.data;
-    console.log(password);
-    resetPassword(email, password);
+    resetPassword(email, values);
   };
 
   const form = useForm<z.infer<typeof ResetPasswordSchema>>({
