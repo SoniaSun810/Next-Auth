@@ -1,19 +1,20 @@
 "use server";
 
-import * as z from "zod";
 import { db } from "@/lib/db";
 import { getUserByEmail } from "@/data/user";
 import bcrypt from "bcryptjs";
-import { LoginSchema } from "@/schemas";
+import * as z from "zod";
+import { ResetPasswordSchema } from "@/schemas";
 
-export const resetPassword = async (email: string | null, password: string | undefined) => {
-  //   const validatedFields = LoginSchema.safeParse(values);
+export const resetPassword = async (email: string | null, values: z.infer<typeof ResetPasswordSchema>) => {
+    const validatedFields = ResetPasswordSchema.safeParse(values);
 
-  //   if (!validatedFields.success) {
-  //     return { error: "Invalid fields" };
-  //   }
+    if (!validatedFields.success) {
+      return { error: "Invalid fields" };
+    }
 
-  //   const { email, password } = validatedFields.data;
+    const { password } = validatedFields.data;
+  
   if (!email || !password) {
     return { error: "Invalid Request" };
   }
